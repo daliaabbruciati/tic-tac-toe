@@ -13,7 +13,7 @@ const initialState = {
     winner: '',
     isBoardFull: false,
     history: [0],
-    newHistoryValue: [0]
+    currentStep: 0
 }
 
 const useLocalStorageState = (key, initialValue) => {
@@ -38,7 +38,7 @@ const useLocalStorageState = (key, initialValue) => {
         }
         prevKeyRef.current = key
         localStorage.setItem(key, JSON.stringify(state))
-    }, [key, state])
+    }, [key,state])
 
     return [state, setState]
 }
@@ -48,7 +48,10 @@ export const Game = () => {
 
     const [gameState, setGameState] = useLocalStorageState('gameState', initialState)
 
-    const {board, turn, winner, isBoardFull, history, newHistoryValue} = gameState
+    const {board, turn, winner, isBoardFull, history, currentStep} = gameState
+
+    let newHistory = history.slice(0, currentStep + 1);
+
 
     const checkWinner = (index) => {
         const combos = [
@@ -85,30 +88,29 @@ export const Game = () => {
             return alert('Already clicked')
         }
 
+
         if (turn === PL1) {
             board[index] = PL1
             setGameState({
                 ...gameState,
                 turn: PL2,
-                history: [...history, [...board]],
-                newHistoryValue: history.slice(0, index + 1),
+                history:[...newHistory, [...board]],
+                currentStep: newHistory.length
             })
         } else {
             board[index] = PL2
             setGameState({
                 ...gameState,
                 turn: PL1,
-                history: [...history, [...board]],
-                newHistoryValue: history.slice(0, index + 1)
+                history:[...newHistory, [...board]],
+                currentStep: newHistory.length
             })
         }
 
-        checkWinner(index);
 
-        console.log(history)
-        console.log(newHistoryValue)
-        console.log(board)
+        checkWinner(index);
     }
+
 
     const onClickShowHistory = (index) => {
 
@@ -117,47 +119,39 @@ export const Game = () => {
             board: JSON.parse(JSON.stringify(history[index])),
             turn: index % 2 === 0 ? PL1 : PL2,
             winner: '',
-            newHistoryValue: history.slice(0, index + 1),
-            // history: history.slice(0, index + 1)
+            currentStep: index
         })
 
 
         //TODO:
-        // 1. per troncare la storia quando clicco sul bottone indice della storia,
-        // ma devo fare in modo che accada solo quando riclicco sulla board
-        // setGameState({..gameState, history: history.slice(0, index + 1) });
-        // 2. sistemare caso in cui clicco sull'indice 0 e mi dice 'already clicked'
+        // 2. sistemare caso in cui clicco sull'indice 0 e mi dice 'already clicked';
+        // 3. sistemare reset
 
 
-        console.log(history[index])
-        console.log(newHistoryValue)
-        console.log(board)
-        console.log(index)
     }
 
-    const onClickRestart = () => setGameState(initialState)
+
+    const onClickRestart = () => {
+        setGameState(initialState)
+    }
 
 
-    console.log('render in Game.js')
+
     return (
         <div className='board'>
             {winner ? <h2>{winner}</h2> : <h2>Player {turn}, it's your turn</h2>}
             {isBoardFull && <h2>Nobody won</h2>}
             <Cell board={board} onClick={winner ? (e) => e.preventDefault : onClickBoard}/>
-            <p>history</p>
             <div className='board__snapshot'>
-                {history.map((item, index) => (
+                {history.map((item, index) => {
+                    const isCurrentStep = index === currentStep
+                    return(
                         <button key={index} className='board__btn-snapshot'
-                                onClick={() => onClickShowHistory(index)}>{index}</button>
-                    )
-                )}
-            </div>
-            <p>new history value</p>
-            <div className='board__snapshot'>
-                {newHistoryValue.map((item, index) => (
-                        <button key={index} className='board__btn-snapshot'
-                                onClick={() => onClickShowHistory(index)}>{index}</button>
-                    )
+                                onClick={() => onClickShowHistory(index)}>
+                            {currentStep || isCurrentStep ? index : null}
+                        </button>
+                        )
+                    }
                 )}
             </div>
             <button className='board__btn-restart' onClick={onClickRestart}>Restart!</button>

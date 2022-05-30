@@ -40,7 +40,17 @@
     border-style: none;
     border-radius: 25%;
     color: rgb(22, 189, 202);
-    background-color: rgb(39, 40, 43);
+    background-color: rgb(54, 54, 59);
+    &:focus{
+      border-style: solid;
+      border-color: rgb(22,189,202);
+      text-decoration-color:rgb(22,189,202);
+      background-color: rgb(39, 40, 43);
+    }
+    &:active{
+      background-color: rgb(22, 189, 202);
+      color: rgb(39, 40, 43);
+    }
   }
 
   &__btn-restart{
@@ -56,7 +66,7 @@
     width: auto;
     margin: 5px;
     padding: 10px;
-    font-size: 12px;
+    font-size: 15px;
     background-color: rgb(22, 189, 202);
     color: rgb(39, 40, 43);
   }
