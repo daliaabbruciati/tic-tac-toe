@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react'
+import React, {useState, useEffect} from 'react'
 import {Cell} from "./cell";
 
 
@@ -29,18 +29,12 @@ const useLocalStorageState = (key, initialValue) => {
         return initialValue
     })
 
-    const prevKeyRef = useRef(key)
-
     useEffect(() => {
-        const prevKey = prevKeyRef.current
-        if (prevKey !== key) {
-            localStorage.removeItem(prevKey)
-        }
-        prevKeyRef.current = key
         localStorage.setItem(key, JSON.stringify(state))
     }, [key,state])
 
     return [state, setState]
+
 }
 
 
@@ -68,7 +62,12 @@ export const Game = () => {
         for (let combo of combos) {
             const [a, b, c] = combo.map(index => board[index])
             if (a !== '' && a === b && b === c) {
-                return setGameState({...gameState, winner: `Winner: player ${board[index]} 🎉🥳`})
+                return setGameState({
+                    ...gameState,
+                    winner: `Winner: player ${board[index]} 🎉🥳`,
+                    history: [...newHistory, [...board]],
+                    currentStep: newHistory.length
+                })
             }
 
             const checkBoardFull = board.every(item => {
@@ -85,7 +84,7 @@ export const Game = () => {
     const onClickBoard = (index) => {
 
         if (board[index] !== '') {
-            return alert('Already clicked')
+             alert('Already clicked')
         }
 
 
@@ -94,7 +93,7 @@ export const Game = () => {
             setGameState({
                 ...gameState,
                 turn: PL2,
-                history:[...newHistory, [...board]],
+                history: [...newHistory, [...board]],
                 currentStep: newHistory.length
             })
         } else {
@@ -106,7 +105,6 @@ export const Game = () => {
                 currentStep: newHistory.length
             })
         }
-
 
         checkWinner(index);
     }
@@ -146,7 +144,7 @@ export const Game = () => {
                 {history.map((item, index) => {
                     const isCurrentStep = index === currentStep
                     return(
-                        <button key={index} className='board__btn-snapshot'
+                        <button key={index} className='board__btn-snapshot' disabled={isCurrentStep}
                                 onClick={() => onClickShowHistory(index)}>
                             {currentStep || isCurrentStep ? index : null}
                         </button>
@@ -154,7 +152,7 @@ export const Game = () => {
                     }
                 )}
             </div>
-            <button className='board__btn-restart' onClick={onClickRestart}>Restart!</button>
+            <button className='board__btn-restart' disabled={currentStep === 0} onClick={onClickRestart}>Restart!</button>
         </div>
     )
 }

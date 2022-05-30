@@ -19,6 +19,10 @@
     font-size: 50px;
     color: rgb(22, 189, 202);
     background-color: rgb(39, 40, 43);
+    &:active{
+      background-color: rgb(22, 189, 202);
+      color: rgb(39, 40, 43);
+    }
   }
 
   &__grid{
@@ -41,15 +45,15 @@
     border-radius: 25%;
     color: rgb(22, 189, 202);
     background-color: rgb(54, 54, 59);
-    &:focus{
-      border-style: solid;
-      border-color: rgb(22,189,202);
-      text-decoration-color:rgb(22,189,202);
-      background-color: rgb(39, 40, 43);
-    }
     &:active{
       background-color: rgb(22, 189, 202);
       color: rgb(39, 40, 43);
+    }
+    &:disabled{
+      border-style: solid;
+      border-color: rgb(17, 141, 152);
+      color: rgb(17, 141, 152);
+      background-color: rgb(39, 40, 43);
     }
   }
 
@@ -69,6 +73,10 @@
     font-size: 15px;
     background-color: rgb(22, 189, 202);
     color: rgb(39, 40, 43);
+    &:disabled{
+      color: rgb(22, 189, 202);
+      background-color: rgb(39, 40, 43);
+    }
   }
 
 
