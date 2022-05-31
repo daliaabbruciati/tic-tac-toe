@@ -5,10 +5,8 @@ import {Cell} from "./cell";
 const PL1 = 'X'
 const PL2 = 'O'
 
-const initialBoard = Array(9).fill('')
-
 const initialState = {
-    board: initialBoard,
+    board: Array(9).fill(''),
     turn: PL1,
     winner: '',
     isBoardFull: false,
@@ -20,21 +18,16 @@ const useLocalStorageState = (key, initialValue) => {
     const [state, setState] = useState(() => {
         const localData = localStorage.getItem(key)
         if (localData) {
-            try {
-                return JSON.parse(localData)
-            } catch (error) {
-                localStorage.removeItem(key)
-            }
+            return JSON.parse(localData)
         }
         return initialValue
     })
 
     useEffect(() => {
         localStorage.setItem(key, JSON.stringify(state))
-    }, [key,state])
+    }, [key, state])
 
     return [state, setState]
-
 }
 
 
@@ -44,7 +37,7 @@ export const Game = () => {
 
     const {board, turn, winner, isBoardFull, history, currentStep} = gameState
 
-    let newHistory = history.slice(0, currentStep + 1);
+    const newHistory = history.slice(0, currentStep + 1);
 
 
     const checkWinner = (index) => {
@@ -80,13 +73,10 @@ export const Game = () => {
         }
     }
 
-
     const onClickBoard = (index) => {
-
         if (board[index] !== '') {
-             alert('Already clicked')
+            return alert('Already clicked')
         }
-
 
         if (turn === PL1) {
             board[index] = PL1
@@ -101,37 +91,36 @@ export const Game = () => {
             setGameState({
                 ...gameState,
                 turn: PL1,
-                history:[...newHistory, [...board]],
+                history: [...newHistory, [...board]],
                 currentStep: newHistory.length
             })
         }
-
         checkWinner(index);
     }
 
+    const onClickRestart = () => {
+        setGameState({
+            board: Array(9).fill(''),
+            turn: PL1,
+            winner: '',
+            isBoardFull: false,
+            history: [0],
+            currentStep: 0
+        })
+    }
 
     const onClickShowHistory = (index) => {
-
         setGameState({
             ...gameState,
             board: JSON.parse(JSON.stringify(history[index])),
             turn: index % 2 === 0 ? PL1 : PL2,
             winner: '',
-            currentStep: index
+            currentStep: index,
+            isBoardFull: false
         })
-
-
-        //TODO:
-        // 2. sistemare caso in cui clicco sull'indice 0 e mi dice 'already clicked';
-        // 3. sistemare reset
-
-
+        console.log([...newHistory])
     }
 
-
-    const onClickRestart = () => {
-        setGameState(initialState)
-    }
 
 
 
@@ -142,17 +131,18 @@ export const Game = () => {
             <Cell board={board} onClick={winner ? (e) => e.preventDefault : onClickBoard}/>
             <div className='board__snapshot'>
                 {history.map((item, index) => {
-                    const isCurrentStep = index === currentStep
-                    return(
-                        <button key={index} className='board__btn-snapshot' disabled={isCurrentStep}
-                                onClick={() => onClickShowHistory(index)}>
-                            {currentStep || isCurrentStep ? index : null}
-                        </button>
+                        const isCurrentStep = index === currentStep
+                        return (
+                            <button key={index} className='board__btn-snapshot' disabled={isCurrentStep}
+                                    onClick={() => onClickShowHistory(index)}>
+                                {currentStep || isCurrentStep ? index : null}
+                            </button>
                         )
                     }
                 )}
             </div>
-            <button className='board__btn-restart' disabled={currentStep === 0} onClick={onClickRestart}>Restart!</button>
+            <button className='board__btn-restart' onClick={onClickRestart}>Restart!
+            </button>
         </div>
     )
 }

@@ -2,10 +2,11 @@ import React from "react";
 
 export const Cell = ({board, onClick}) => {
     function renderCells(index) {
+        const player = board[index]
         return (
             <button className="board__cells"
                     onClick={() => onClick(index)}>
-                {board[index]}
+                {player ? player : '.'}
             </button>
         )
     }
