@@ -1,10 +1,10 @@
 import React from "react";
 
-export const Cell = ({board, onClick}) => {
+export const Cell = ({board, onClick, disable}) => {
     function renderCells(index) {
         const player = board[index]
         return (
-            <button className="board__cells"
+            <button className="board__cells" disabled={player || disable}
                     onClick={() => onClick(index)}>
                 {player ? player : '.'}
             </button>

@@ -1,7 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import {Cell} from "./cell";
 
-
 const PL1 = 'X'
 const PL2 = 'O'
 
@@ -9,7 +8,6 @@ const initialState = {
     board: Array(9).fill(''),
     turn: PL1,
     winner: '',
-    isBoardFull: false,
     history: [0],
     currentStep: 0
 }
@@ -35,7 +33,7 @@ export const Game = () => {
 
     const [gameState, setGameState] = useLocalStorageState('gameState', initialState)
 
-    const {board, turn, winner, isBoardFull, history, currentStep} = gameState
+    const {board, turn, winner, history, currentStep} = gameState
 
     const newHistory = history.slice(0, currentStep + 1);
 
@@ -63,20 +61,15 @@ export const Game = () => {
                 })
             }
 
-            const checkBoardFull = board.every(item => {
-                return item !== ''
-            })
+            const checkBoardFull = board.every(item => item !== '')
 
             if (checkBoardFull) {
-                setGameState({...gameState, isBoardFull: true})
+                setGameState({...gameState, winner: 'Nobody won!'})
             }
         }
     }
 
     const onClickBoard = (index) => {
-        if (board[index] !== '') {
-            return alert('Already clicked')
-        }
 
         if (turn === PL1) {
             board[index] = PL1
@@ -95,7 +88,25 @@ export const Game = () => {
                 currentStep: newHistory.length
             })
         }
-        checkWinner(index);
+        checkWinner(index)
+
+        console.log(board)
+        console.log(history)
+        console.log(newHistory)
+    }
+
+
+    const onClickShowHistory = (index) => {
+        setGameState({
+            ...gameState,
+            board: JSON.parse(JSON.stringify(history[index])),
+            currentStep: index,
+            winner: '',
+        })
+
+        console.log(board)
+        console.log(history)
+        console.log(newHistory)
     }
 
     const onClickRestart = () => {
@@ -103,47 +114,39 @@ export const Game = () => {
             board: Array(9).fill(''),
             turn: PL1,
             winner: '',
-            isBoardFull: false,
-            history: [0],
+            history: [],
             currentStep: 0
         })
     }
-
-    const onClickShowHistory = (index) => {
-        setGameState({
-            ...gameState,
-            board: JSON.parse(JSON.stringify(history[index])),
-            turn: index % 2 === 0 ? PL1 : PL2,
-            winner: '',
-            currentStep: index,
-            isBoardFull: false
-        })
-        console.log([...newHistory])
-    }
-
-
 
 
     return (
         <div className='board'>
             {winner ? <h2>{winner}</h2> : <h2>Player {turn}, it's your turn</h2>}
-            {isBoardFull && <h2>Nobody won</h2>}
-            <Cell board={board} onClick={winner ? (e) => e.preventDefault : onClickBoard}/>
+            <Cell board={board} disable={winner} onClick={winner ? (e) => e.preventDefault : onClickBoard}/>
             <div className='board__snapshot'>
                 {history.map((item, index) => {
                         const isCurrentStep = index === currentStep
                         return (
-                            <button key={index} className='board__btn-snapshot' disabled={isCurrentStep}
+                            <button
+                                    key={index}
+                                    className='board__btn-snapshot'
+                                    disabled={isCurrentStep}
                                     onClick={() => onClickShowHistory(index)}>
-                                {currentStep || isCurrentStep ? index : null}
+                                    {currentStep || isCurrentStep ? index : null}
                             </button>
                         )
                     }
                 )}
             </div>
-            <button className='board__btn-restart' onClick={onClickRestart}>Restart!
+            <button
+                className='board__btn-restart'
+                disabled={currentStep === 0}
+                onClick={onClickRestart}>
+                Restart!
             </button>
         </div>
+
     )
 }
 
