@@ -1,12 +1,15 @@
 import React, {useEffect, useState} from 'react'
 import {Cell} from "./cell";
 
-const PL1 = 'X'
-const PL2 = 'O'
+const PLAYER = {
+    PL1:'X',
+    PL2: 'O',
+    NOBODY: 'Nobody won!'
+}
 
 const initialState = {
     board: Array(9).fill(''),
-    turn: PL1,
+    turn: PLAYER.PL1,
     winner: '',
     history: [Array(9).fill('')],
     indexHistory: 0,
@@ -59,30 +62,25 @@ export const Game = () => {
         return winner
             ? winner
             : board.every(item => item !== '')
-                ? 'Nobody won'
+                ? PLAYER.NOBODY
                 : `Player ${turn}, it's your turn`
     }
 
     const onClickBoard = (index) => {
-        if (turn === PL1) {
-            board[index] = PL1
-            setGameState({
-                ...gameState,
-                turn: PL2,
-                history: [...newHistory, [...board]],
-                indexHistory: index,
-                currentStep: newHistory.length
-            })
-        } else {
-            board[index] = PL2
-            setGameState({
-                ...gameState,
-                turn: PL1,
-                history: [...newHistory, [...board]],
-                indexHistory: index,
-                currentStep: newHistory.length
-            })
+        if (turn === PLAYER.PL1) {
+            board[index] = PLAYER.PL1
+            gameState.turn = PLAYER.PL2
         }
+        if (turn === PLAYER.PL2){
+            board[index] = PLAYER.PL2
+            gameState.turn = PLAYER.PL1
+        }
+        setGameState({
+            ...gameState,
+            history: [...newHistory, [...board]],
+            indexHistory: index,
+            currentStep: newHistory.length
+        })
     }
 
     checkWinner(indexHistory)
@@ -92,7 +90,7 @@ export const Game = () => {
         setGameState({
             ...gameState,
             board: JSON.parse(JSON.stringify(history[index])),
-            turn: index % 2 === 0 ? PL1 : PL2,
+            turn: index % 2 === 0 ? PLAYER.PL1 : PLAYER.PL2,
             currentStep: index,
             winner: ''
         })
@@ -101,7 +99,7 @@ export const Game = () => {
     const onClickRestart = () => {
         setGameState({
             board: Array(9).fill(''),
-            turn: PL1,
+            turn: PLAYER.PL1,
             winner: '',
             history: [Array(9).fill('')],
             currentStep: 0
